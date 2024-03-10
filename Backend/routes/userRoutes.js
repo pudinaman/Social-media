@@ -1,5 +1,5 @@
 const express=require("express");
-const {registerUser, loginUser, logout, forgotPassword, resetPassword, getUserDetail, UpdateUserPassword, UpdateUserProfile, getAllUser, getSingleUser, UpdateUserRole, deleteUser}=require("../controllers/userControler");
+const {registerUser, loginUser, logout, forgotPassword, resetPassword, getUserDetail, UpdateUserPassword, UpdateUserProfile, getAllUser, getSingleUser, UpdateUserRole, deleteUser, followUser, unfollowUser}=require("../controllers/userControler");
 const {isAuthenticatedUser,authorizedRoles}= require("../middleware/auth");
 const router =express.Router();
 
@@ -24,6 +24,8 @@ router .route("/admin/user/:id")
 .get(isAuthenticatedUser,authorizedRoles("admin"),getSingleUser)
 .put(isAuthenticatedUser,authorizedRoles("admin"),UpdateUserRole)
 .delete(isAuthenticatedUser,authorizedRoles("admin"),deleteUser);
+router .route("/follow/:id").post(isAuthenticatedUser,followUser);
+router.route('/unfollow/:id').post(isAuthenticatedUser,unfollowUser);
 
 
 

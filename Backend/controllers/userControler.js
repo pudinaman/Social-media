@@ -1,4 +1,4 @@
-const ErrorHandler = require("../utils/errorHandler");
+const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const User = require("../models/userModel");
 const sendToken = require("../utils/jwtToken"); // Fix the import statement
@@ -247,6 +247,52 @@ exports.UpdateUserRole = catchAsyncErrors(async(req,res,next)=>{
     success: true
   });
 });
+// Follow a user
+exports.followUser = catchAsyncErrors(async (req, res, next) => {
+  const userToFollowId = req.params.userId;
+
+  // Check if the user exists
+  const userToFollow = await User.findById(userToFollowId);
+  if (!userToFollow) {
+    return next(new ErrorHandler('User to follow not found', 404));
+  }
+
+  // Add the user to follow in the 'following' list of the current user
+  req.user.following.addToSet(userToFollowId);
+  await req.user.save();
+
+  // Add the current user in the 'followers' list of the user to follow
+  userToFollow.followers.addToSet(req.user._id);
+  await userToFollow.save();
+
+  res.status(200).json({
+    success: true,
+    message: `You are now following ${userToFollow.username}`
+  });
+});
+
+// Unfollow a user
+exports.unfollowUser = catchAsyncErrors(async (req, res, next) => {
+  const userToUnfollowId = req.params.userId;
+
+  // Remove the user to unfollow from the 'following' list of the current user
+  req.user.following.pull(userToUnfollowId);
+  await req.user.save();
+
+  // Remove the current user from the 'followers' list of the user to unfollow
+  const userToUnfollow = await User.findById(userToUnfollowId);
+  if (!userToUnfollow) {
+    return next(new ErrorHandler('User to unfollow not found', 404));
+  }
+  userToUnfollow.followers.pull(req.user._id);
+  await userToUnfollow.save();
+
+  res.status(200).json({
+    success: true,
+    message: `You have unfollowed ${userToUnfollow.username}`
+  });
+});
+
 
  
  
