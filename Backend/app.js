@@ -12,9 +12,11 @@ app.use(cookieParser()); // Fix: Invoke cookieParser as a function
 const product = require("../Backend/routes/productRoutes");
 const user = require("./routes/userRoutes");
 const order=require("./routes/orderRoutes");
+const post =require("./routes/postRoute");
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1",order);
+app.use("/api/v1",post);
 
 module.exports = app;
 
